@@ -8,9 +8,10 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+@interface ViewController ()<UIScrollViewDelegate>
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
+@property (strong, nonatomic) NSTimer *timer;
 
 @end
 
@@ -47,10 +48,23 @@
     //启动定时器
     //消息循环
     //获取当前线程的消息循环
+    self.timer = timer;
     NSRunLoop *runloop = [NSRunLoop currentRunLoop];
     //把定时器添加到消息循环中
-    [runloop addTimer:timer forMode:NSDefaultRunLoopMode];
+    //NSRunLoopCommonModes 可以解决UI变动带来的卡顿
+    [runloop addTimer:timer forMode:NSRunLoopCommonModes];
+    
+    
+    //立即执行定时器的方法
+//    [timer fire];
+    
+    //线程 同步 异步问题
+    
+    
+    
+    
 }
+
 
 -(void)nextImage
 {
@@ -79,6 +93,19 @@
 }
 
 
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    //移除定时器
+    [self.timer invalidate];
+}
+
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    //创建一个定时器，并以default模式加入到当前的消息循环中年
+    self.timer = [NSTimer scheduledTimerWithTimeInterval:2.0 target:self selector:@selector(nextImage) userInfo:nil repeats:YES];
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
